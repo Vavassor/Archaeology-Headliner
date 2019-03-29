@@ -5,7 +5,16 @@ const cheerio = require("cheerio");
 const models = require("../models");
 
 module.exports = (app) => {
-  app.get("/api/article", function(request, response) {
+  app.delete("/api/article", (request, response) => {
+    models.Article
+      .deleteMany()
+      .then(() => {
+        response.status(204).end();
+      })
+      .catch(error => console.error(error));
+  });
+
+  app.get("/api/article", (request, response) => {
     models.Article
       .find()
       .then(articles => response.json(articles))
@@ -28,12 +37,29 @@ module.exports = (app) => {
           };
 
           models.Article
-            .create(article)
+            .findOneAndUpdate(
+              {
+                title: article.title,
+              },
+              article,
+              {
+                upsert: true,
+              }
+            )
             .catch(error => console.error(error));
         });
 
-        response.send("Scrape complete.");
+        response.send("Scrape completed.");
       })
+      .catch(error => console.error(error));
+  });
+
+  app.patch("/api/article/:id", (request, response) => {
+    const update = request.body;
+
+    models.Article
+      .findByIdAndUpdate(request.params.id, update)
+      .then(article => response.json(article))
       .catch(error => console.error(error));
   });
 };

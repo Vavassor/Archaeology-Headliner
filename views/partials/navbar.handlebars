@@ -6,9 +6,13 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbar-content">
-        <form id="scrape" class="form-inline" method="POST" action="/api/article/scrape">
-          <button class="btn btn-primary" type="submit">Scrape New Articles</button>
-        </form>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/saved-articles">Saved Articles</a>
+          </li>
+        </ul>
+        <button id="scrape" class="btn btn-primary" type="button">Scrape New Articles</button>
+        <button id="clear-articles" class="btn btn-secondary ml-md-2" type="button">Clear Articles</button>
       </div>
     </nav>
   </div>
