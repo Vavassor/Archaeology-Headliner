@@ -27,6 +27,8 @@ module.exports = (app) => {
       .then((siteResponse) => {
         const $ = cheerio.load(siteResponse.data);
 
+        const articles = [];
+
         $(".grid__wrapper__card").each((i, element) => {
           const card = $(element);
 
@@ -38,19 +40,26 @@ module.exports = (app) => {
             link: link.href,
           };
 
-          models.Article
-            .findOneAndUpdate(
-              {
-                title: article.title,
-              },
-              article,
-              {
-                upsert: true,
-              }
-            )
-            .catch(error => handleError(error));
+          articles.push(article);
         });
 
+        return models.Article.bulkWrite(
+          articles.map((article) => {
+            return {
+              updateOne: {
+                filter: {
+                  title: article.title,
+                },
+                update: {
+                  $set: article,
+                },
+                upsert: true,
+              },
+            };
+          })
+        );
+      })
+      .then((writeResult) => {
         response.send("Scrape completed.");
       })
       .catch(error => handleError(error));
@@ -61,7 +70,12 @@ module.exports = (app) => {
 
     models.Article
       .findByIdAndUpdate(request.params.id, update)
-      .then(article => response.json(article))
+      .then((article) => {
+        if (!article) {
+          return response.status(404).end();
+        }
+        response.json(article);
+      })
       .catch(error => handleError(error));
   });
 };
