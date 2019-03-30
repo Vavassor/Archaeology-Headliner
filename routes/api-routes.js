@@ -21,22 +21,26 @@ module.exports = (app) => {
   });
 
   app.post("/api/article/scrape", (request, response) => {
-    const base = "https://waypoint.vice.com/en_us";
     axios
-      .get(base)
+      .get("https://www.archaeology.org/news")
       .then((siteResponse) => {
         const $ = cheerio.load(siteResponse.data);
 
         const articles = [];
 
-        $(".grid__wrapper__card").each((i, element) => {
+        $(".news_intro").each((i, element) => {
           const card = $(element);
 
-          const link = new URL(card.attr("href"), base);
+          const relativePath = card
+            .children("p")
+            .first()
+            .children("a")
+            .attr("href");
+          const link = new URL(relativePath, "https://www.archaeology.org");
 
           const article = {
-            title: card.find(".grid__wrapper__card__text__title").text(),
-            summary: card.find(".grid__wrapper__card__text__summary").text(),
+            title: card.find(".news_title").text(),
+            summary: card.find(".news_cont").text(),
             link: link.href,
           };
 
@@ -75,6 +79,43 @@ module.exports = (app) => {
           return response.status(404).end();
         }
         response.json(article);
+      })
+      .catch(error => handleError(error));
+  });
+
+  app.get("/api/note", (request, response) => {
+    const conditions = {};
+
+    if (request.params.article) {
+      conditions.article = request.params.article;
+    }
+
+    models.Note
+      .find(conditions)
+      .then(notes => response.json(notes))
+      .catch(error => handleError(error));
+  });
+
+  app.post("/api/note", (request, response) => {
+    const note = request.body;
+
+    models.Note
+      .create(note)
+      .then((note) => {
+        response.json(note);
+      })
+      .catch(error => handleError(error));
+  });
+
+  app.delete("/api/note/:id", (request, response) => {
+    const id = request.params.id;
+
+    models.Note
+      .deleteOne({
+        "_id": id,
+      })
+      .then(() => {
+        response.status(204).end();
       })
       .catch(error => handleError(error));
   });

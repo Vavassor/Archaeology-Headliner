@@ -8,7 +8,8 @@
           <div class="card-body">
             <a href="{{article.link}}"><h2 class="card-title">{{article.title}}</h2></a>
             <p class="card-text">{{article.summary}}</p>
-            <button class="btn btn-secondary remove-button" type="button" data-article-id="{{article._id}}">Remove</button>
+            <button class="btn btn-secondary show-notes" type="button" data-article-id="{{article._id}}">Show Notes</button>
+            <button class="btn btn-danger remove-button" type="button" data-article-id="{{article._id}}">Remove</button>
           </div>
         </div>
       </div>
@@ -22,6 +23,34 @@
         </div>
       </div>
     {{/each}}
+  </div>
+</div>
+
+<div class="modal" id="note-modal" tabindex="-1" role="dialog" aria-labelledby="note-modal-label" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="note-modal-label">Notes</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="notes"></div>
+        <h5>Add Note</h5>
+        <form id="add-note-form" class="needs-validation" novalidate>
+          <div class="form-group">
+            <label for="note-text">Note</label>
+            <textarea class="form-control" id="note-text" required></textarea>
+            <div class="invalid-feedback">Please enter a note.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="add-note-form">Add</button>
+      </div>
+    </div>
   </div>
 </div>
 
