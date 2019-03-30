@@ -10,7 +10,7 @@ module.exports = (app) => {
         response.render(
           "index",
           {
-            title: "Headliner",
+            title: "Archaeology Headliner",
             articles: articles,
           }
         );
@@ -36,6 +36,11 @@ module.exports = (app) => {
   });
 
   app.get("*", (request, response) => {
-    response.render("page-not-found");
+    response.render(
+      "page-not-found",
+      {
+        title: "Page Not Found"
+      }
+    );
   });
 };
